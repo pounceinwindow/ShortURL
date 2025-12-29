@@ -1,3 +1,4 @@
+using MaxMind.GeoIP2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,13 @@ using URLShortener.Endpoints;
 using URLShortener.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var geoDbPath = builder.Configuration["GeoIp:CityDbPath"];
+builder.Services.AddSingleton<DatabaseReader?>(_ =>
+    !string.IsNullOrWhiteSpace(geoDbPath) && File.Exists(geoDbPath)
+        ? new DatabaseReader(geoDbPath)
+        : null
+);
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -28,7 +36,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 var app = builder.Build();
-
-
 app.MapAuthEndpoints();
+app.MapLinkEndpoints(); 
+
+
 app.Run();

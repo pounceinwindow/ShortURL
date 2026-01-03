@@ -1,14 +1,15 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 using MaxMind.GeoIP2;
 
 namespace URLShortener.GeoIp;
 
 public class GetGeoIp
 {
-    
     public static (string country, string city) ResolveGeo(DatabaseReader? reader, string? ip, string acceptLangHeader)
     {
-        if (reader == null || string.IsNullOrWhiteSpace(ip) || !IPAddress.TryParse(ip, out var addr) || !IsPublicIp(addr))
+        if (reader == null || string.IsNullOrWhiteSpace(ip) || !IPAddress.TryParse(ip, out var addr) ||
+            !IsPublicIp(addr))
             return ("", "");
 
         try
@@ -17,13 +18,13 @@ public class GetGeoIp
             // язык интерфейса — возьмём ru, если он первый в Accept-Language
             var lang = (acceptLangHeader ?? "").StartsWith("ru", StringComparison.OrdinalIgnoreCase) ? "ru" : "en";
 
-            string country = "";
+            var country = "";
             if (resp.Country?.Names != null && resp.Country.Names.TryGetValue(lang, out var cName))
                 country = cName;
             else
                 country = resp.Country?.Name ?? resp.Country?.IsoCode ?? "";
 
-            string city = "";
+            var city = "";
             if (resp.City?.Names != null && resp.City.Names.TryGetValue(lang, out var ct))
                 city = ct;
             else
@@ -41,7 +42,7 @@ public class GetGeoIp
     {
         if (IPAddress.IsLoopback(ip)) return false;
 
-        if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        if (ip.AddressFamily == AddressFamily.InterNetwork)
         {
             var b = ip.GetAddressBytes();
             // 10.0.0.0/8
@@ -54,10 +55,11 @@ public class GetGeoIp
             if (b[0] == 169 && b[1] == 254) return false;
             // 127.0.0.0/8 (loopback уже проверили)
         }
-        else if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+        else if (ip.AddressFamily == AddressFamily.InterNetworkV6)
         {
             if (ip.IsIPv6LinkLocal || ip.IsIPv6SiteLocal) return false;
         }
+
         return true;
     }
 }

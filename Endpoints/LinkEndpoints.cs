@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using MaxMind.GeoIP2;
@@ -36,18 +35,14 @@ public static class LinkEndpoints
 
             var code = (dto.ShortCode ?? "").Trim();
             if (string.IsNullOrEmpty(code))
-            {
                 for (var i = 0; i < 8; i++)
                 {
                     code = GenerateCode(7);
                     if (!await db.ShortLinks.AnyAsync(x => x.ShortCode == code)) break;
                     if (i == 7) return Results.StatusCode(500);
                 }
-            }
             else if (await db.ShortLinks.AnyAsync(x => x.ShortCode == code))
-            {
                 return Results.Conflict(new { message = "shortCode already exists" });
-            }
 
             var link = new ShortLink
             {
@@ -60,7 +55,7 @@ public static class LinkEndpoints
             await db.SaveChangesAsync();
 
             var shortUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{code}";
-            return Results.Ok(new CreateLinkResponse {Id = link.Id, ShortCode = link.ShortCode, ShortUrl = shortUrl});
+            return Results.Ok(new CreateLinkResponse { Id = link.Id, ShortCode = link.ShortCode, ShortUrl = shortUrl });
         });
 
         links.MapGet("/{code}/qr", static async (
@@ -76,12 +71,12 @@ public static class LinkEndpoints
             var data = new QRCodeGenerator().CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
 
             var targetPx = Math.Clamp(size ?? 256, 128, 4096);
-            var modules  = data.ModuleMatrix.Count;
-            var ppm      = Math.Max(1, targetPx / modules);
+            var modules = data.ModuleMatrix.Count;
+            var ppm = Math.Max(1, targetPx / modules);
 
             var png = new PngByteQRCode(data).GetGraphic(ppm);
             return Results.File(png, "image/png");
-        }).AllowAnonymous(); 
+        }).AllowAnonymous();
 
         app.MapGet("/{code}/qr", static async (
             [FromRoute] string code,
@@ -96,8 +91,8 @@ public static class LinkEndpoints
             var data = new QRCodeGenerator().CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
 
             var targetPx = Math.Clamp(size ?? 256, 128, 4096);
-            var modules  = data.ModuleMatrix.Count;
-            var ppm      = Math.Max(1, targetPx / modules);
+            var modules = data.ModuleMatrix.Count;
+            var ppm = Math.Max(1, targetPx / modules);
 
             var png = new PngByteQRCode(data).GetGraphic(ppm);
             return Results.File(png, "image/png");
@@ -110,35 +105,35 @@ public static class LinkEndpoints
                 AppDbContext db,
                 DatabaseReader? geo,
                 HttpRequest req) =>
-        {
-            var link = await db.ShortLinks.FirstOrDefaultAsync(l => l.ShortCode == code);
-            if (link is null) return Results.NotFound();
-
-            var ip = GetIp.GetClientIp(req);
-            var (country, city) = GetGeoIp.ResolveGeo(geo, ip, req.Headers["Accept-Language"]);
-
-            var ua      = req.Headers["User-Agent"].ToString();
-            var referer = req.Headers["Referer"].ToString();
-            var client  = Parser.GetDefault().Parse(ua);
-            var device  = DeviceType.InferDeviceType(ua);
-            var browser = $"{client.UA.Family} {client.UA.Major}".Trim();
-
-            db.Clicks.Add(new Click
             {
-                ShortLinkId = link.Id,
-                Timestamp   = DateTime.UtcNow, 
-                IpAddress   = ip ?? string.Empty,
-                UserAgent   = ua ?? string.Empty,
-                Referer     = string.IsNullOrWhiteSpace(referer) ? string.Empty : referer,
-                Browser     = string.IsNullOrWhiteSpace(browser) ? "Unknown" : browser,
-                DeviceType  = string.IsNullOrWhiteSpace(device) ? "desktop" : device,
-                Country     = string.IsNullOrWhiteSpace(country) ? "Unknown" : country,
-                City        = string.IsNullOrWhiteSpace(city) ? "Unknown" : city
-            });
+                var link = await db.ShortLinks.FirstOrDefaultAsync(l => l.ShortCode == code);
+                if (link is null) return Results.NotFound();
 
-            await db.SaveChangesAsync();
-            return Results.Redirect(link.OriginalUrl, permanent: false);
-        }).AllowAnonymous();
+                var ip = GetIp.GetClientIp(req);
+                var (country, city) = GetGeoIp.ResolveGeo(geo, ip, req.Headers["Accept-Language"]);
+
+                var ua = req.Headers["User-Agent"].ToString();
+                var referer = req.Headers["Referer"].ToString();
+                var client = Parser.GetDefault().Parse(ua);
+                var device = DeviceType.InferDeviceType(ua);
+                var browser = $"{client.UA.Family} {client.UA.Major}".Trim();
+
+                db.Clicks.Add(new Click
+                {
+                    ShortLinkId = link.Id,
+                    Timestamp = DateTime.UtcNow,
+                    IpAddress = ip ?? string.Empty,
+                    UserAgent = ua ?? string.Empty,
+                    Referer = string.IsNullOrWhiteSpace(referer) ? string.Empty : referer,
+                    Browser = string.IsNullOrWhiteSpace(browser) ? "Unknown" : browser,
+                    DeviceType = string.IsNullOrWhiteSpace(device) ? "desktop" : device,
+                    Country = string.IsNullOrWhiteSpace(country) ? "Unknown" : country,
+                    City = string.IsNullOrWhiteSpace(city) ? "Unknown" : city
+                });
+
+                await db.SaveChangesAsync();
+                return Results.Redirect(link.OriginalUrl, false);
+            }).AllowAnonymous();
     }
 
     private static string GenerateCode(int len)

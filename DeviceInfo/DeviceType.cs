@@ -2,7 +2,7 @@
 
 public class DeviceType
 {
-    public static string InferDeviceType( string ua)
+    public static string InferDeviceType(string ua)
     {
         var u = ua.ToLowerInvariant();
         if (u.Contains("ipad") || u.Contains("tablet")) return "tablet";

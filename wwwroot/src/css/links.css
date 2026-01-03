@@ -1,0 +1,43 @@
+@import url("register.css");
+
+.container {
+    align-items: start;
+    width: 1200px;
+    height: 680px;
+
+    text-align: start;
+
+    padding: 20px;
+}
+
+.main__title {
+    margin: 0px;
+}
+
+.main__form {
+    display: flex;
+    justify-content: start;
+    align-items: end;
+    gap: 20px;
+
+    margin: 20px 0 0 0;
+}
+
+
+.main__form__field--search .main__form__input {
+    width: 300px;
+}
+
+.main__form__field--date-range .main__form__input {
+    width: 260px;
+}
+
+.main__form__field--status .main__form__input {
+    width: 170px;
+    background-color: transparent;
+}
+
+
+.main__form__submit {
+    width: 140px;
+}

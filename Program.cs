@@ -36,8 +36,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 var app = builder.Build();
+
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    DefaultFileNames = new List<string> { "login.html" }
+});
+
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapAuthEndpoints();
-app.MapLinkEndpoints(); 
+app.MapLinkEndpoints();
 
 
 app.Run();

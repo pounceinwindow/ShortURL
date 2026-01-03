@@ -10,22 +10,17 @@ public class Click
 
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
-    [StringLength(45)]
-    public string IpAddress { get; set; }
+    [StringLength(45)] public string IpAddress { get; set; }
 
     public string UserAgent { get; set; }
 
     public string Referer { get; set; }
-    
-    [StringLength(100)]
-    public string Country { get; set; }
 
-    [StringLength(100)]
-    public string City { get; set; }
+    [StringLength(100)] public string Country { get; set; }
 
-    [StringLength(50)]
-    public string DeviceType { get; set; }
+    [StringLength(100)] public string City { get; set; }
 
-    [StringLength(50)]
-    public string Browser { get; set; }
+    [StringLength(50)] public string DeviceType { get; set; }
+
+    [StringLength(50)] public string Browser { get; set; }
 }

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+    <link href="src/css/create_link.css" rel="stylesheet">
+    
+    <title>Create link page</title>
+</head>
+<body>
+<div class="header">
+    <a class="header__logo logo" href="#!">Shortener</a>
+    <nav class="header__nav">
+        <a class="header__link link" href="#!">My links</a>
+        <a class="header__link link" href="/create_link.html">Create link</a>
+        <a class="header__link link" href="/login.html">Log out</a>
+    </nav>
+</div>
+
+<section class="main">
+    <div class="container">
+        <h1 class="main__title title">Create short link</h1>
+        <div class="main__form-and-qr">
+            <div class="main__form">
+                <div class="main__form__field main__form__field--long-url">
+                    <label class="main__form__label label" for="long_link">Long URL</label>
+                    <input class="main__form__input input" name="long_link" placeholder="https://" type="text">
+                </div>
+
+                <div class="main__form__field-group">
+                    <div class="main__form__field main__form__field--slug">
+                        <label class="main__form__label label" for="slug">Custom slug (optional)</label>
+                        <input class="main__form__input input" name="slug" placeholder="slug" type="text">
+                    </div>
+                    <div class="main__form__field main__form__field--expires">
+                        <label class="main__form__label label" for="expires">Expires at (optional)</label>
+                        <input class="main__form__input input" max="2030-01-01T00:00" min="2025-10-10T00:00"
+                               name="expires" placeholder="YYYY-MM-DD" type="datetime-local"
+                               value="2018-06-12T19:30">
+                    </div>
+                </div>
+                <button class="main__form__submit button">Generate</button>
+
+            </div>
+
+            <div class="main__qr">
+                <a class="main__qr__link link" href="#!">http://timofejr.ru/abc123</a>
+                <div class="main__qr__image"></div>
+
+                <button class="main__qr__button button">Copy</button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="src/css/stats.css" rel="stylesheet">
+
+    <title>Link stats</title>
+</head>
+<body>
+<div class="header">
+    <a class="header__logo logo" href="#!">Shortener</a>
+    <nav class="header__nav">
+        <a class="header__link link" href="/links.html">My links</a>
+        <a class="header__link link" href="/create_link.html">Create link</a>
+        <a class="header__link link" href="/login.html">Log in</a>
+    </nav>
+</div>
+
+<section class="main">
+    <div class="container">
+        <div class="main__card main__card--stats">
+
+            <h1 class="main__title title">Link Stats</h1>
+
+            <div class="stats__top">
+                <div class="stats__metric">
+                    <div class="stats__metric-label">Total clicks</div>
+                    <div class="stats__metric-value" data-total-clicks>1337</div>
+                </div>
+
+                <div class="stats__metric">
+                    <div class="stats__metric-label">Last 24h</div>
+                    <div class="stats__metric-value" data-last-24h>69</div>
+                </div>
+
+                <div class="stats__metric">
+                    <div class="stats__metric-label">Last click</div>
+                    <div class="stats__metric-value stats__metric-value--time" data-last-click>
+                        Today 14:88
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats__block stats__block--chart">
+                <div class="stats__block-title">Clicks over time (7d)</div>
+                <div class="stats__chart">
+                    <!-- парсим из графини метрики -->
+                </div>
+            </div>
+
+            <div class="stats__block stats__block--table">
+                <div class="stats__block-title">Recent clicks</div>
+
+                <div class="stats__table-wrapper">
+                    <table class="stats__table">
+                        <thead>
+                        <tr>
+                            <th>DATE &amp; TIME</th>
+                            <th>CLIENT</th>
+                            <th>TARGET URL</th>
+                            <th>IP HASH</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- шаблонизатором из бд парсим -->
+                        <tr>
+                            <td>2025-10-13 13:20</td>
+                            <td>Chrome on Windows</td>
+                            <td><a class="link stats__url" href="https://ref.example">https://ref.example</a></td>
+                            <td>IP hash: a1b2...</td>
+                        </tr>
+
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+</body>
+</html>

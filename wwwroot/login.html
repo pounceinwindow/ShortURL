@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="src/css/login.css" rel="stylesheet">
+    <title>Login page</title>
+</head>
+<body>
+<div class="header">
+    <a class="header__logo logo" href="#!">Shortener</a>
+    <nav class="header__nav">
+        <a class="header__link link" href="#!">My links</a>
+        <a class="header__link link" href="/create_link.html">Create link</a>
+        <a class="header__link link" href="/register.html">Create account</a>
+    </nav>
+</div>
+
+<section class="main">
+    <div class="container">
+        <h1 class="main__title title">Sign in</h1>
+        <div class="main__form">
+            <div class="main__form__field main__form__field--email">
+                <label class="main__form__label label" for="email">Email</label>
+                <input class="main__form__input input" name="email" placeholder="you@example.com" type="email">
+            </div>
+
+            <div class="main__form__field main__form__field--password">
+                <label class="main__form__label label" for="password">Password</label>
+                <input class="main__form__input input" name="password" placeholder="***********" type="password">
+            </div>
+
+            <button class="main__form__submit button">Sign in</button>
+            <a class="main__form__link main__form__link--no-account link" href="/register.html">No account? Sign up</a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

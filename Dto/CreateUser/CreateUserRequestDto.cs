@@ -8,8 +8,6 @@ public class CreateUserRequestDto
     [EmailAddress]
     [StringLength(256)]
     public string Email { get; set; }
-    
-    [Required]
-    [StringLength(256)]
-    public string Password { get; set; }
+
+    [Required] [StringLength(256)] public string Password { get; set; }
 }

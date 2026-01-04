@@ -1,6 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using URLShortener.Data;
@@ -14,7 +13,6 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-
         app.MapPost("/auth/login", ([FromBody] LoginRequestDto loginData, [FromServices] AppDbContext db) =>
         {
             var user = db.Users.FirstOrDefault(u => u.Email == loginData.Email && u.Password == loginData.Password);

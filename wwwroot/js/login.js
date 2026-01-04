@@ -7,11 +7,14 @@ btn.addEventListener("click", async (e) => {
 
     const r = await fetch("/auth/login", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ email, password })
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email, password})
     });
 
-    if (!r.ok) { alert("Неверный логин/пароль"); return; }
+    if (!r.ok) {
+        alert("Неверный логин/пароль");
+        return;
+    }
 
     const data = await r.json();
     localStorage.setItem("token", data.accessToken);

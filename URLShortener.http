@@ -21,25 +21,26 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
-> {% client.global.set("token", response.body.accessToken); %}
+> {%
+    client.global.set("token", response.body.accessToken);
+%}
 
 ### 3) Проверка авторизации
 GET {{host}}/auth/test
 Authorization: Bearer {{token}}
 
-### 4) Создать короткую ссылку (ВАЖНО: shortCode обязателен в твоей модели)
-# @name createLink
+### 
 POST {{host}}/links/
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "originalUrl": "https://docs.google.com/document/d/1t1pSWfwaMs2XouBb_gUbHfZPSXc_gj0o4NIgug9wXJs/mobilebasic",
-  "shortCode": "Abc"
+  "shortCode": "Ab11c"
 }
 
 ### 5) Получить QR (публично)
-GET {{host}}/Abc123/qr?size=280
+GET {{host}}/Ab11c/qr?size=360
 
 ### 6) Редирект (публично + запишет клик)
-GET {{host}}/Abc123
+GET {{host}}/Ab11c

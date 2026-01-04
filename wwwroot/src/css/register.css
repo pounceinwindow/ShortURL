@@ -4,12 +4,13 @@
     width: 480px;
     height: 455px;
 }
+
 .provider {
-    margin-top: 16px ;
+    margin-top: 16px;
     width: 82px;
     height: 42px;
     display: flex;
-    justify-self: center; 
+    justify-self: center;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
@@ -17,10 +18,11 @@
     background: #fff;
 }
 
-.provider img{
+.provider img {
     width: 25px;
     height: 25px;
 }
+
 .main__form__link--account-exists {
     margin-top: 10px;
     font-size: 14px;

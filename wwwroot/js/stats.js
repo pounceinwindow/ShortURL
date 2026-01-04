@@ -1,0 +1,128 @@
+// Require auth for this page
+const token = localStorage.getItem("token");
+if (!token) location.href = "/login.html";
+
+// Logout (clear token)
+document.querySelector("[data-logout]")?.addEventListener("click", () => {
+  localStorage.removeItem("token");
+});
+
+async function authJson(path, { method = "GET", body } = {}) {
+  const r = await fetch(path, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+
+  if (r.status === 401) {
+    localStorage.removeItem("token");
+    location.href = "/login.html";
+    return;
+  }
+
+  const text = await r.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    // When the server returns an HTML error page (e.g., developer exception page),
+    // JSON.parse will throw. Keep the raw text for debugging.
+    data = { raw: text };
+  }
+
+  if (!r.ok) {
+    const msg = data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : null) || "API_ERROR";
+    throw new Error(msg);
+  }
+
+  return data;
+}
+
+(async () => {
+  try {
+    const params = new URLSearchParams(location.search);
+    const code = params.get("code");
+    if (!code) { alert("Нет code в query (?code=...)"); location.href = "/links.html"; return; }
+
+    const totalEl = document.querySelector("[data-total-clicks]");
+    const last24El = document.querySelector("[data-last-24h]");
+    const lastClickEl = document.querySelector("[data-last-click]");
+    const tbody = document.querySelector(".stats__table tbody");
+    const chartEl = document.querySelector(".stats__chart");
+
+    const s = await authJson(`/links/${encodeURIComponent(code)}/stats`);
+
+    totalEl.textContent = s.totalClicks;
+    last24El.textContent = s.last24h;
+    lastClickEl.textContent = s.lastClick ? new Date(s.lastClick).toLocaleString() : "—";
+
+    // Chart (7 days)
+    render7dChart(chartEl, s.series7d || []);
+
+    tbody.innerHTML = (s.recent || []).map(c => {
+      const url = safeHttpUrl(c.referer);
+      const target = url
+        ? `<a class="link stats__url" href="${escapeAttr(url)}" target="_blank" rel="noreferrer">${escapeHtml(url)}</a>`
+        : "—";
+
+      return `
+      <tr>
+        <td>${new Date(c.timestamp).toLocaleString()}</td>
+        <td>${c.browser} · ${c.deviceType}</td>
+        <td>${target}</td>
+        <td>IP hash: ${c.ipHash}</td>
+      </tr>
+      `;
+    }).join("");
+  } catch (e) {
+    // Prefer server error message, but also show a fragment of raw response if we got HTML
+    const msg = e?.message || String(e);
+    alert(msg);
+  }
+})();
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function escapeAttr(str) {
+  return escapeHtml(str).replaceAll('"', "&quot;");
+}
+
+function safeHttpUrl(u) {
+  const s = (u || "").trim();
+  if (!s) return null;
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  return null;
+}
+
+function render7dChart(root, series7d) {
+  if (!root) return;
+
+  // Normalize to 7 points (server should already do this, but keep it robust)
+  const points = Array.isArray(series7d) ? series7d : [];
+  const max = Math.max(1, ...points.map(x => Number(x.clicks || 0)));
+
+  root.innerHTML = `
+    <div class="chart-bars">
+      ${points.map(p => {
+        const clicks = Number(p.clicks || 0);
+        const h = Math.round((clicks / max) * 100);
+        const d = p.day ? new Date(p.day) : null;
+        const label = d ? d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
+        return `
+          <div class="chart-bar" title="${clicks}">
+            <div class="chart-bar__fill" style="height:${h}%;"></div>
+            <div class="chart-bar__label">${escapeHtml(label)}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}

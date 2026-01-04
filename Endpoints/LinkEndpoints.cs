@@ -8,6 +8,7 @@ using QRCoder;
 using UAParser;
 using URLShortener.Data;
 using URLShortener.DTO;
+using URLShortener.Dto.Links;
 using URLShortener.Entities;
 using URLShortener.GeoIp;
 
@@ -17,6 +18,7 @@ public static class LinkEndpoints
 {
     public static void MapLinkEndpoints(this WebApplication app)
     {
+        
         var links = app.MapGroup("/links").RequireAuthorization();
 
         links.MapPost("/", static async (
@@ -57,26 +59,54 @@ public static class LinkEndpoints
             var shortUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{code}";
             return Results.Ok(new CreateLinkResponse { Id = link.Id, ShortCode = link.ShortCode, ShortUrl = shortUrl });
         });
-
-        links.MapGet("/{code}/qr", static async (
-            [FromRoute] string code,
-            [FromQuery] int? size,
+        
+        links.MapGet("/", static async (
+            [FromQuery] int page,
+            [FromQuery] int pageSize,
+            [FromQuery] string? q,
             AppDbContext db,
-            HttpContext ctx) =>
+            HttpContext ctx,
+            ClaimsPrincipal user) =>
         {
-            var link = await db.ShortLinks.FirstOrDefaultAsync(l => l.ShortCode == code);
-            if (link is null) return Results.NotFound();
+            page = page <= 0 ? 1 : page;
+            pageSize = pageSize is <= 0 or > 100 ? 20 : pageSize;
 
-            var url = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{code}";
-            var data = new QRCodeGenerator().CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+            var email = user.Identity?.Name;
+            var dbUser = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+            if (dbUser is null) return Results.Unauthorized();
 
-            var targetPx = Math.Clamp(size ?? 256, 128, 4096);
-            var modules = data.ModuleMatrix.Count;
-            var ppm = Math.Max(1, targetPx / modules);
+            var query = db.ShortLinks.AsNoTracking().Where(l => l.UserId == dbUser.Id);
 
-            var png = new PngByteQRCode(data).GetGraphic(ppm);
-            return Results.File(png, "image/png");
-        }).AllowAnonymous();
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var s = q.Trim();
+                query = query.Where(l => l.ShortCode.Contains(s) || l.OriginalUrl.Contains(s));
+            }
+
+            var total = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(l => l.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .GroupJoin(
+                    db.Clicks.AsNoTracking(),
+                    l => l.Id,
+                    c => c.ShortLinkId,
+                    (l, clicks) => new { l, clicksCount = clicks.Count() }
+                )
+                .Select(x => new LinkListItemDto(
+                    x.l.Id,
+                    x.l.ShortCode,
+                    x.l.OriginalUrl,
+                    x.l.CreatedAt,
+                    x.clicksCount,
+                    $"{ctx.Request.Scheme}://{ctx.Request.Host}/{x.l.ShortCode}"
+                ))
+                .ToListAsync();
+
+            return Results.Ok(new LinksListResponseDto(page, pageSize, total, items));
+        });
 
         app.MapGet("/{code}/qr", static async (
             [FromRoute] string code,
@@ -132,10 +162,86 @@ public static class LinkEndpoints
                 });
 
                 await db.SaveChangesAsync();
-                return Results.Redirect(link.OriginalUrl, false);
+                return Results.Redirect(link.OriginalUrl);
             }).AllowAnonymous();
-    }
+        
+        links.MapGet("/{code}/stats", static async (
+            [FromRoute] string code,
+            AppDbContext db,
+            ClaimsPrincipal user) =>
+        {
+            var email = user.Identity?.Name;
+            var dbUser = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+            if (dbUser is null) return Results.Unauthorized();
 
+            var link = await db.ShortLinks.AsNoTracking()
+                .FirstOrDefaultAsync(l => l.UserId == dbUser.Id && l.ShortCode == code);
+            if (link is null) return Results.NotFound();
+
+            var linkId = link.Id;
+            var now = DateTime.UtcNow;
+            var since24h = now.AddHours(-24);
+            var since7d = now.Date.AddDays(-6); // 7 дней включая сегодня
+
+            var totalClicks = await db.Clicks.AsNoTracking().CountAsync(c => c.ShortLinkId == linkId);
+            var last24h = await db.Clicks.AsNoTracking().CountAsync(c => c.ShortLinkId == linkId && c.Timestamp >= since24h);
+
+            var lastClick = await db.Clicks.AsNoTracking()
+                .Where(c => c.ShortLinkId == linkId)
+                .OrderByDescending(c => c.Timestamp)
+                .Select(c => (DateTime?)c.Timestamp)
+                .FirstOrDefaultAsync();
+
+            // EF providers sometimes fail to translate GroupBy over DateTime.Date.
+            // Since we only need the last 7 days, load the timestamps and aggregate in-memory.
+            var clicks7d = await db.Clicks.AsNoTracking()
+                .Where(c => c.ShortLinkId == linkId && c.Timestamp >= since7d)
+                .Select(c => c.Timestamp)
+                .ToListAsync();
+
+            var byDay = clicks7d
+                .GroupBy(t => t.Date)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var startDay = since7d.Date;
+            var series7d = Enumerable.Range(0, 7)
+                .Select(i => startDay.AddDays(i))
+                .Select(day => new DayClicksDto(day, byDay.TryGetValue(day, out var cnt) ? cnt : 0))
+                .ToList();
+
+            var recent = await db.Clicks.AsNoTracking()
+                .Where(c => c.ShortLinkId == linkId)
+                .OrderByDescending(c => c.Timestamp)
+                .Take(25)
+                .Select(c => new ClickRowDto(
+                    c.Timestamp,
+                    c.Browser,
+                    c.DeviceType,
+                    c.Referer,
+                    c.Country,
+                    c.City,
+                    ShortIpHash(c.IpAddress)
+                ))
+                .ToListAsync();
+
+            return Results.Ok(new LinkStatsResponseDto(
+                link.ShortCode,
+                link.OriginalUrl,
+                totalClicks,
+                last24h,
+                lastClick,
+                series7d,
+                recent
+            ));
+        });
+
+    }
+    static string ShortIpHash(string ip)
+    {
+        using var sha = SHA256.Create();
+        var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(ip ?? ""));
+        return Convert.ToHexString(bytes).ToLowerInvariant()[..8];
+    }
     private static string GenerateCode(int len)
     {
         const string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

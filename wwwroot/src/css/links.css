@@ -42,3 +42,37 @@
 .main__form__submit {
     width: 140px;
 }
+
+.links__table-wrapper {
+    margin-top: 24px;
+    overflow-x: auto;
+}
+
+.links__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.links__table th,
+.links__table td {
+    text-align: left;
+    padding: 8px 6px;
+    white-space: nowrap;
+}
+
+.links__table th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9c9c9c;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.links__table td {
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.links__table a {
+    color: #e26b6b;
+}

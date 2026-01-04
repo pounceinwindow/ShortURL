@@ -19,6 +19,52 @@ public static class LinkEndpoints
     {
         var links = app.MapGroup("/links").RequireAuthorization();
 
+        links.MapGet("/", static async (
+            [FromQuery] string? search,
+            AppDbContext db,
+            HttpContext ctx,
+            ClaimsPrincipal user) =>
+        {
+            var email = user.Identity?.Name;
+            var dbUser = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (dbUser is null) return Results.Unauthorized();
+
+            var query = db.ShortLinks
+                .Where(link => link.UserId == dbUser.Id);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim();
+                query = query.Where(link =>
+                    link.ShortCode.Contains(term) || link.OriginalUrl.Contains(term));
+            }
+
+            var baseUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}";
+            var items = await query
+                .OrderByDescending(link => link.CreatedAt)
+                .Select(link => new LinkListItemDto
+                {
+                    Id = link.Id,
+                    ShortCode = link.ShortCode,
+                    ShortUrl = string.Empty,
+                    OriginalUrl = link.OriginalUrl,
+                    CreatedAt = link.CreatedAt,
+                    TotalClicks = link.Clicks.Count,
+                    LastClickAt = link.Clicks
+                        .OrderByDescending(click => click.Timestamp)
+                        .Select(click => (DateTime?)click.Timestamp)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            foreach (var item in items)
+            {
+                item.ShortUrl = $"{baseUrl}/{item.ShortCode}";
+            }
+
+            return Results.Ok(items);
+        });
+
         links.MapPost("/", static async (
             [FromBody] CreateLinkRequest dto,
             AppDbContext db,
@@ -56,6 +102,54 @@ public static class LinkEndpoints
 
             var shortUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{code}";
             return Results.Ok(new CreateLinkResponse { Id = link.Id, ShortCode = link.ShortCode, ShortUrl = shortUrl });
+        });
+
+        links.MapGet("/{id:int}/stats", static async (
+            [FromRoute] int id,
+            AppDbContext db,
+            HttpContext ctx,
+            ClaimsPrincipal user) =>
+        {
+            var email = user.Identity?.Name;
+            var dbUser = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (dbUser is null) return Results.Unauthorized();
+
+            var link = await db.ShortLinks
+                .Include(l => l.Clicks)
+                .FirstOrDefaultAsync(l => l.Id == id && l.UserId == dbUser.Id);
+
+            if (link is null) return Results.NotFound();
+
+            var baseUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}";
+            var last24hThreshold = DateTime.UtcNow.AddHours(-24);
+            var recentClicks = link.Clicks
+                .OrderByDescending(click => click.Timestamp)
+                .Take(20)
+                .Select(click => new LinkStatsClickDto
+                {
+                    Timestamp = click.Timestamp,
+                    Browser = string.IsNullOrWhiteSpace(click.Browser) ? "Unknown" : click.Browser,
+                    Referer = string.IsNullOrWhiteSpace(click.Referer) ? "-" : click.Referer,
+                    IpHash = HashIp(click.IpAddress)
+                })
+                .ToList();
+
+            var stats = new LinkStatsDto
+            {
+                Id = link.Id,
+                ShortCode = link.ShortCode,
+                ShortUrl = $"{baseUrl}/{link.ShortCode}",
+                OriginalUrl = link.OriginalUrl,
+                TotalClicks = link.Clicks.Count,
+                Last24Hours = link.Clicks.Count(click => click.Timestamp >= last24hThreshold),
+                LastClickAt = link.Clicks
+                    .OrderByDescending(click => click.Timestamp)
+                    .Select(click => (DateTime?)click.Timestamp)
+                    .FirstOrDefault(),
+                RecentClicks = recentClicks
+            };
+
+            return Results.Ok(stats);
         });
 
         links.MapGet("/{code}/qr", static async (
@@ -144,5 +238,13 @@ public static class LinkEndpoints
         var sb = new StringBuilder(len);
         for (var i = 0; i < len; i++) sb.Append(alphabet[bytes[i] % alphabet.Length]);
         return sb.ToString();
+    }
+
+    private static string HashIp(string? ip)
+    {
+        if (string.IsNullOrWhiteSpace(ip)) return "unknown";
+
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(ip));
+        return Convert.ToHexString(bytes)[..8].ToLowerInvariant();
     }
 }

@@ -71,11 +71,11 @@ body {
     font-size: 16px;
     font-weight: bold;
     font-style: italic;
-
+    
     border: 0px;
     border-radius: 10px;
     background: #FB7185;
-    background: linear-gradient(90deg, rgba(251, 113, 133, 1) 0%, rgba(249, 115, 22, 1) 100%);
+    background: linear-gradient(90deg,rgba(251, 113, 133, 1) 0%, rgba(249, 115, 22, 1) 100%);
     transition: background 0.3s ease;
     cursor: pointer;
 }
@@ -124,7 +124,7 @@ body {
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center;     
     width: 100%;
     background-color: #E89CC1;
 }
@@ -134,7 +134,7 @@ body {
     height: 400px;
     border-radius: 20px;
     background: #FFFFFF;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 247, 237, 1) 100%);
+    background: linear-gradient(90deg,rgba(255, 255, 255, 1) 0%, rgba(255, 247, 237, 1) 100%);
     text-align: center;
 }
 
@@ -223,6 +223,6 @@ body {
     text-decoration: underline;
 }
 
-.main__form__field--expires .input {
+.main__form__field--expires .input{
     padding-right: 10px;
 }

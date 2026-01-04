@@ -14,7 +14,6 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        app.MapGet("/auth/test", [Authorize]() => "Hello World!");
 
         app.MapPost("/auth/login", ([FromBody] LoginRequestDto loginData, [FromServices] AppDbContext db) =>
         {

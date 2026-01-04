@@ -6,7 +6,6 @@ public class GetIp
 {
     public static string? GetClientIp(HttpRequest req)
     {
-        // Приоритет X-Forwarded-For (если за прокси), иначе RemoteIpAddress
         var xff = req.Headers["X-Forwarded-For"].ToString();
         if (!string.IsNullOrWhiteSpace(xff))
             foreach (var raw in xff.Split(','))

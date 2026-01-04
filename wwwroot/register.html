@@ -2,47 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <link href="src/css/register.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/css/register.css">
 </head>
 <body>
-<div class="header">
-    <a class="header__logo logo" href="#!">Shortener</a>
-    <nav class="header__nav">
-        <a class="header__link link" href="#!">My links</a>
-        <a class="header__link link" href="/create_link.html">Create link</a>
-        <a class="header__link link" href="/login.html">Log in</a>
-    </nav>
-</div>
-
-<section class="main">
-    <div class="container">
-        <h1 class="main__title title">Create account</h1>
-        <div class="main__form">
-            <div class="main__form__field main__form__field--email">
-                <label class="main__form__label label" for="email">Email</label>
-                <input class="main__form__input input" name="email" placeholder="you@example.com" type="email">
-            </div>
-
-            <div class="main__form__field main__form__field--password">
-                <label class="main__form__label label" for="password">Password</label>
-                <input class="main__form__input input" name="password" placeholder="***********" type="password">
-            </div>
-
-            <div class="main__form__field main__form__field--confirm-password">
-                <label class="main__form__label label" for="confirm-password">Confirm password</label>
-                <input class="main__form__input input" name="confirm-password" placeholder="***********"
-                       type="password">
-            </div>
-            <button aria-label="Google" class="main__form__submit provider">
-                <a href="google.com"></a>
-                <img alt="" src="https://unpkg.com/simple-icons@v11/icons/google.svg">
-            </button>
-            <button class="main__form__submit button">Sign up</button>
-            <a class="main__form__link main__form__link--account-exists link" href="/login.html">Already have an
-                account? Sign in</a>
-        </div>
+    <div class="header">
+        <a href="#!" class="header__logo logo">Shortener</a>
+        <nav class="header__nav">
+            <a href="#!" class="header__link link">My links</a>
+            <a href="/create_link.html" class="header__link link">Create link</a>
+            <a href="/login.html" class="header__link link">Log in</a>
+        </nav>
     </div>
-</section>
+
+    <section class="main">
+        <div class="container">
+            <h1 class="main__title title">Create account</h1>
+            <div class="main__form">
+                <div class="main__form__field main__form__field--email">
+                    <label class="main__form__label label" for="email">Email</label>
+                    <input class="main__form__input input" type="email" name="email" placeholder="you@example.com">
+                </div>
+
+                <div class="main__form__field main__form__field--password">
+                    <label class="main__form__label label" for="password">Password</label>
+                    <input class="main__form__input input" type="password" name="password" placeholder="***********">
+                </div>
+
+                <div class="main__form__field main__form__field--confirm-password">
+                    <label class="main__form__label label" for="confirm-password">Confirm password</label>
+                    <input class="main__form__input input" type="password" name="confirm-password" placeholder="***********">
+                </div>
+                <button aria-label="Google" class="main__form__submit provider">
+                    <a href="google.com"></a>
+                    <img alt="" src="https://unpkg.com/simple-icons@v11/icons/google.svg">
+                </button>
+                <button class="main__form__submit button">Sign up</button>
+                <a href="/login.html" class="main__form__link main__form__link--account-exists link">Already have an account? Sign in</a>
+            </div>
+        </div>
+    </section>
+<script src="js/register.js"></script>
 </body>
 </html>

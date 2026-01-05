@@ -51,7 +51,6 @@ async function authJson(path, { method = "GET", body } = {}) {
     const last24El = document.querySelector("[data-last-24h]");
     const lastClickEl = document.querySelector("[data-last-click]");
     const tbody = document.querySelector(".stats__table tbody");
-    const chartEl = document.querySelector(".stats__chart");
 
     const s = await authJson(`/links/${encodeURIComponent(code)}/stats`);
 
@@ -59,26 +58,26 @@ async function authJson(path, { method = "GET", body } = {}) {
     last24El.textContent = s.last24h;
     lastClickEl.textContent = s.lastClick ? new Date(s.lastClick).toLocaleString() : "—";
 
-    // Chart (7 days)
-    render7dChart(chartEl, s.series7d || []);
 
-    tbody.innerHTML = (s.recent || []).map(c => {
-      const url = safeHttpUrl(c.referer);
-      const target = url
-        ? `<a class="link stats__url" href="${escapeAttr(url)}" target="_blank" rel="noreferrer">${escapeHtml(url)}</a>`
-        : "—";
+      tbody.innerHTML = (s.recent || []).map(c => {
+          const url = safeHttpUrl(c.referer);
+          const target = url
+              ? `<a class="link stats__url" href="${escapeAttr(url)}" target="_blank" rel="noreferrer">${escapeHtml(url)}</a>`
+              : "—";
 
-      return `
-      <tr>
-        <td>${new Date(c.timestamp).toLocaleString()}</td>
-        <td>${c.browser} · ${c.deviceType}</td>
-        <td>${target}</td>
-        <td>IP hash: ${c.ipHash}</td>
-      </tr>
-      `;
-    }).join("");
+          return `
+  <tr>
+    <td>${new Date(c.timestamp).toLocaleString()}</td>
+    <td>${escapeHtml(`${c.browser} · ${c.deviceType}`)}</td>
+    <td>${escapeHtml(c.country || "—")}</td>
+    <td>${escapeHtml(c.city || "—")}</td>
+    <td>${escapeHtml(c.ipAddress || "—")}</td>
+    <td>${target}</td>
+  </tr>
+  `;
+      }).join("");
+
   } catch (e) {
-    // Prefer server error message, but also show a fragment of raw response if we got HTML
     const msg = e?.message || String(e);
     alert(msg);
   }
@@ -102,27 +101,4 @@ function safeHttpUrl(u) {
   return null;
 }
 
-function render7dChart(root, series7d) {
-  if (!root) return;
 
-  // Normalize to 7 points (server should already do this, but keep it robust)
-  const points = Array.isArray(series7d) ? series7d : [];
-  const max = Math.max(1, ...points.map(x => Number(x.clicks || 0)));
-
-  root.innerHTML = `
-    <div class="chart-bars">
-      ${points.map(p => {
-        const clicks = Number(p.clicks || 0);
-        const h = Math.round((clicks / max) * 100);
-        const d = p.day ? new Date(p.day) : null;
-        const label = d ? d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
-        return `
-          <div class="chart-bar" title="${clicks}">
-            <div class="chart-bar__fill" style="height:${h}%;"></div>
-            <div class="chart-bar__label">${escapeHtml(label)}</div>
-          </div>
-        `;
-      }).join("")}
-    </div>
-  `;
-}

@@ -7,7 +7,7 @@
 
 .provider {
     margin-top: 16px;
-    width: 82px;
+    width: 400px;
     height: 42px;
     display: flex;
     justify-self: center;
@@ -32,6 +32,7 @@
     opacity: 33%;
     transition: opacity 0.3s ease;
 }
+
 
 .main__form__link--account-exists:hover {
     opacity: 100%;

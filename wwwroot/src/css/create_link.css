@@ -215,7 +215,6 @@ body {
     justify-content: center;
 }
 
-/* Show placeholder only when empty */
 .main__qr__image:empty {
     background-image: url("../img/qr.png");
     background-repeat: no-repeat;

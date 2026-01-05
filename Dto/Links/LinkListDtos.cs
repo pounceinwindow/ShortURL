@@ -23,7 +23,7 @@ public record ClickRowDto(
     string Referer,
     string Country,
     string City,
-    string IpHash
+    string IpAddress
 );
 
 public record DayClicksDto(DateTime Day, int Clicks);
@@ -34,6 +34,5 @@ public record LinkStatsResponseDto(
     int TotalClicks,
     int Last24h,
     DateTime? LastClick,
-    IReadOnlyList<DayClicksDto> Series7d,
     IReadOnlyList<ClickRowDto> Recent
 );

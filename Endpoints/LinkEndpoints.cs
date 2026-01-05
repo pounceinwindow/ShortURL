@@ -181,7 +181,6 @@ public static class LinkEndpoints
             var linkId = link.Id;
             var now = DateTime.UtcNow;
             var since24h = now.AddHours(-24);
-            var since7d = now.Date.AddDays(-6); // 7 дней включая сегодня
 
             var totalClicks = await db.Clicks.AsNoTracking().CountAsync(c => c.ShortLinkId == linkId);
             var last24h = await db.Clicks.AsNoTracking().CountAsync(c => c.ShortLinkId == linkId && c.Timestamp >= since24h);
@@ -191,23 +190,6 @@ public static class LinkEndpoints
                 .OrderByDescending(c => c.Timestamp)
                 .Select(c => (DateTime?)c.Timestamp)
                 .FirstOrDefaultAsync();
-
-            // EF providers sometimes fail to translate GroupBy over DateTime.Date.
-            // Since we only need the last 7 days, load the timestamps and aggregate in-memory.
-            var clicks7d = await db.Clicks.AsNoTracking()
-                .Where(c => c.ShortLinkId == linkId && c.Timestamp >= since7d)
-                .Select(c => c.Timestamp)
-                .ToListAsync();
-
-            var byDay = clicks7d
-                .GroupBy(t => t.Date)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            var startDay = since7d.Date;
-            var series7d = Enumerable.Range(0, 7)
-                .Select(i => startDay.AddDays(i))
-                .Select(day => new DayClicksDto(day, byDay.TryGetValue(day, out var cnt) ? cnt : 0))
-                .ToList();
 
             var recent = await db.Clicks.AsNoTracking()
                 .Where(c => c.ShortLinkId == linkId)
@@ -220,7 +202,7 @@ public static class LinkEndpoints
                     c.Referer,
                     c.Country,
                     c.City,
-                    ShortIpHash(c.IpAddress)
+                    c.IpAddress
                 ))
                 .ToListAsync();
 
@@ -230,17 +212,10 @@ public static class LinkEndpoints
                 totalClicks,
                 last24h,
                 lastClick,
-                series7d,
                 recent
             ));
         });
 
-    }
-    static string ShortIpHash(string ip)
-    {
-        using var sha = SHA256.Create();
-        var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(ip ?? ""));
-        return Convert.ToHexString(bytes).ToLowerInvariant()[..8];
     }
     private static string GenerateCode(int len)
     {

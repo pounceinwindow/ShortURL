@@ -55,6 +55,7 @@ btn.addEventListener("click", async (e) => {
 
     linkEl.textContent = data.shortUrl;
     linkEl.href = data.shortUrl;
+    linkEl.target = "_blank"
 
     // Keep QR inside the card (see CSS .main__qr__image)
     qrBox.innerHTML = `<img alt="QR" src="/${data.shortCode}/qr?size=200">`;

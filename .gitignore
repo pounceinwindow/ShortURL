@@ -3,5 +3,4 @@ obj/
 .idea/
 *.iml
 *.log
-appsettings.Development.json
-appsettings.json
+*.json

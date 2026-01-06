@@ -20,3 +20,10 @@ btn.addEventListener("click", async (e) => {
     localStorage.setItem("token", data.accessToken);
     location.href = "/create_link.html";
 });
+const googleBtn = document.querySelector(".provider");
+if (googleBtn) {
+    googleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = "/auth/google?returnUrl=/create_link.html";
+    });
+}

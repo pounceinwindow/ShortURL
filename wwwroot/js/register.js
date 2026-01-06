@@ -27,3 +27,10 @@ document.querySelector(".button").addEventListener("click", async (e) => {
 
     location.href = "/login.html";
 });
+const googleBtn = document.querySelector(".provider");
+if (googleBtn) {
+    googleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = "/auth/google?returnUrl=/create_link.html";
+    });
+}

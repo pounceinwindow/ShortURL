@@ -6,7 +6,6 @@ Minimal API на **ASP.NET (net9.0)** + **PGSQL** + статический фр�
 
 <br/>
 
-<!-- Badges -->
 ![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![PGs](https://img.shields.io/badge/PGSQL-DB-4169E1?style=for-the-badge&logo=PGsql&logoColor=white)
 ![Minimal API](https://img.shields.io/badge/ASP.NET-Minimal%20API-0B5FFF?style=for-the-badge)
@@ -15,13 +14,13 @@ Minimal API на **ASP.NET (net9.0)** + **PGSQL** + статический фр�
 
 <br/>
 
-> “Ссылка длинная, жизнь короткая.” — **ShortURL**
+> “life is short, link is long” — **Some smart guy....**
 
 </div>
 
 ---
 
-## ✨ Что умеет
+## ✅  Features
 
 - 🔐 **Регистрация / логин** (JWT)
 - 🟦 **Вход через Google (OAuth2)** *(server-side redirect flow → выдача твоего JWT)*
@@ -42,7 +41,7 @@ Minimal API на **ASP.NET (net9.0)** + **PGSQL** + статический фр�
 
 ---
 
-## 🧱 Стек
+## Stack
 
 - Backend: **ASP.NET Core (Minimal API)**, **EF Core**, **JWT Bearer**
 - DB: **PGSQL** 
@@ -50,15 +49,6 @@ Minimal API на **ASP.NET (net9.0)** + **PGSQL** + статический фр�
 - QR: **QRCoder**
 - UA parse: **UAParser**
 - Geo: **MaxMind.GeoIP2** (mmdb)
-
----
-
-## 🚀 Быстрый старт (локально)
-
-### 0) Требования
-- .NET SDK **9**
-- PGSQL **13+**
----
 
 ### 1) Создай БД и пропиши connection string.
 

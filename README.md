@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔗 ShortURL — мини-сервис для сокращения ссылок + аналитика кликов
+# 🔗 ShortURL — AWESOME CREATOR SHORT LINKS WITH ANALYZE
 
 Minimal API на **ASP.NET (net9.0)** + **PGSQL** + статический фронт на **HTML/CSS/JS**.
 

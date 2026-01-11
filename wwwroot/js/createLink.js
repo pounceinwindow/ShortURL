@@ -1,13 +1,11 @@
-// Require auth for this page
 const token = localStorage.getItem("token");
 if (!token) location.href = "/login.html";
 
-// Logout (clear token)
 document.querySelector("[data-logout]")?.addEventListener("click", () => {
     localStorage.removeItem("token");
 });
 
-const btn = document.querySelector(".main__form__submit");
+const btn = document.querySelector(".main_do_form__submit");
 const longInput = document.querySelector('input[name="long_link"]');
 const slugInput = document.querySelector('input[name="slug"]');
 const expiresInput = document.querySelector('input[name="expires"]');
@@ -33,7 +31,6 @@ btn.addEventListener("click", async (e) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
         },
-        // expiresAt пока не используется на бэке — оставлено на будущее
         body: JSON.stringify({ originalUrl, shortCode, expiresAt })
     });
 
@@ -57,7 +54,6 @@ btn.addEventListener("click", async (e) => {
     linkEl.href = data.shortUrl;
     linkEl.target = "_blank"
 
-    // Keep QR inside the card (see CSS .main__qr__image)
     qrBox.innerHTML = `<img alt="QR" src="/${data.shortCode}/qr?size=200">`;
 });
 

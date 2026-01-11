@@ -1,7 +1,6 @@
 const token = localStorage.getItem("token");
 if (!token) location.href = "/login.html";
 
-// Logout (clear token)
 document.querySelector("[data-logout]")?.addEventListener("click", () => {
   localStorage.removeItem("token");
 });

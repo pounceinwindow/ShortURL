@@ -1,8 +1,6 @@
-// Require auth for this page
 const token = localStorage.getItem("token");
 if (!token) location.href = "/login.html";
 
-// Logout (clear token)
 document.querySelector("[data-logout]")?.addEventListener("click", () => {
   localStorage.removeItem("token");
 });
@@ -28,8 +26,6 @@ async function authJson(path, { method = "GET", body } = {}) {
   try {
     data = text ? JSON.parse(text) : null;
   } catch {
-    // When the server returns an HTML error page (e.g., developer exception page),
-    // JSON.parse will throw. Keep the raw text for debugging.
     data = { raw: text };
   }
 

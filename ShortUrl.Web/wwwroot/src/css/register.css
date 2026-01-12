@@ -1,0 +1,43 @@
+@import url("login.css");
+
+.container {
+    width: 480px;
+    height: 455px;
+}
+
+.provider {
+    margin-top: 16px;
+    width: 400px;
+    height: 42px;
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 0.5px solid #6096B4;
+    background: #fff;
+}
+
+.provider img {
+    width: 25px;
+    height: 25px;
+}
+
+.main__form__link--account-exists {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    color: #584545;
+    opacity: 33%;
+    transition: opacity 0.3s ease;
+}
+
+
+.main__form__link--account-exists:hover {
+    opacity: 100%;
+}
+
+.main__form__field--confirm-password {
+    margin-top: 10px;
+}

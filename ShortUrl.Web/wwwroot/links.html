@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="src/css/links.css" rel="stylesheet">
+    <title>My links</title>
+</head>
+<body>
+<div class="header">
+    <a class="header__logo logo" href="#!">Shortener</a>
+    <nav class="header__nav">
+        <a class="header__link link" href="#!">My links</a>
+        <a class="header__link link" href="/create_link.html">Create link</a>
+        <a class="header__link link" data-logout href="/login.html">Log out</a>
+    </nav>
+</div>
+
+<section class="main">
+    <div class="container">
+        <h1 class="main__title title">My links</h1>
+        <div class="main__form">
+            <div class="main__form__field main__form__field--search">
+                <label class="main__form__label label" for="search">Search</label>
+                <input class="main__form__input input" name="search" placeholder="Seatch by slug or target URL..."
+                       type="text">
+            </div>
+
+            <div class="main__form__field main__form__field--date-range">
+                <label class="main__form__label label" for="date-range">Date range</label>
+                <input class="main__form__input input" name="date-range" placeholder="Last 30 days" type="text">
+            </div>
+
+            <div class="main__form__field main__form__field--status">
+                <label class="main__form__label label" for="status">Confirm password</label>
+                <select class="main__form__input main__form__input--select input" name="status">
+                    <option class="main__form__option" value="all">All</option>
+                    <option class="main__form__option" value="active">Active</option>
+                    <option class="main__form__option" value="inactive">Inactive</option>
+                </select>
+            </div>
+
+            <button class="main__form__submit button">Search</button>
+            <div class="main__list" id="linksList"></div>
+            <script src="/js/links.js"></script>
+
+        </div>
+    </div>
+</section>
+</body>
+</html>

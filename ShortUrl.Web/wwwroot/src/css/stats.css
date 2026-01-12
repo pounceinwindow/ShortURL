@@ -1,0 +1,124 @@
+@import url("create_link.css");
+
+.main__card--stats {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 24px 24px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #fff9f4 0%, #fff2fb 100%);
+    box-shadow: 0 20px 45px rgba(12, 0, 37, 0.18);
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.main__card--stats .main__title {
+    margin: 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+.stats__top {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.stats__metric {
+    border-radius: 16px;
+    border: 1px solid #f3ebe4;
+    background: linear-gradient(135deg, #fffaf6 0%, #fff6ff 100%);
+    padding: 10px 14px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+}
+
+.stats__metric-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9c9c9c;
+    margin-bottom: 4px;
+}
+
+.stats__metric-value {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.stats__metric-value--time {
+    font-size: 18px;
+}
+
+.stats__block {
+    border-radius: 16px;
+    border: 1px solid #f3f0ed;
+    background-color: #ffffff;
+    padding: 12px 16px 14px;
+}
+
+.stats__block-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.container {
+    width: 950px;
+    margin-bottom: 100px;
+}
+
+.stats__table-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 420px;
+}
+
+
+.stats__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.stats__table th,
+.stats__table td {
+    text-align: left;
+    padding: 6px 4px;
+    white-space: nowrap;
+}
+
+.stats__table thead th {
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 2;
+}
+
+.stats__table th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9c9c9c;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stats__table td {
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.stats__url {
+    color: #e26b6b;
+}
+
+@media (max-width: 900px) {
+    .main__card--stats {
+        max-width: 100%;
+        padding-inline: 16px;
+    }
+
+    .stats__top {
+        grid-template-columns: 1fr;
+    }
+}

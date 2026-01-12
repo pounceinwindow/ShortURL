@@ -1,4 +1,3 @@
-using MaxMind.Db;
 using MaxMind.GeoIP2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +45,7 @@ public static class ServiceCollectionExtensions
             if (!File.Exists(path))
                 throw new FileNotFoundException($"GeoIP database not found: {path}");
 
-            return new DatabaseReader(path, FileAccessMode.MemoryMapped);
+            return new DatabaseReader(path);
         });
 
         return services;
@@ -55,13 +54,16 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddAppDb(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                               ?? throw new InvalidOperationException(
+                                   "Connection string 'DefaultConnection' not found.");
 
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
         return services;
     }
 
-    private static IServiceCollection AddAppAuthentication(this IServiceCollection services, IConfiguration configuration)
+
+    private static IServiceCollection AddAppAuthentication(this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddAuthorization();
 

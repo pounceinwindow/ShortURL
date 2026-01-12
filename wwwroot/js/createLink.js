@@ -5,7 +5,7 @@ document.querySelector("[data-logout]")?.addEventListener("click", () => {
     localStorage.removeItem("token");
 });
 
-const btn = document.querySelector(".main_do_form__submit");
+const btn = document.querySelector(".main__form__submit");
 const longInput = document.querySelector('input[name="long_link"]');
 const slugInput = document.querySelector('input[name="slug"]');
 const expiresInput = document.querySelector('input[name="expires"]');

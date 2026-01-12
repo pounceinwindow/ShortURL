@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using URLShortener.Data;
 using URLShortener.DTO;
 using URLShortener.Entities;
@@ -15,27 +15,30 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        app.MapPost("/auth/login", ([FromBody] LoginRequestDto loginData, [FromServices] AppDbContext db, [FromServices] JwtTokenService tokens) =>
-        {
-            var user = db.Users.FirstOrDefault(u => u.Email == loginData.Email && u.Password == loginData.Password);
-
-            if (user is null) return Results.Unauthorized();
-
-            var encodedJwt = tokens.CreateToken(user.Email);
-
-            var loginResponse = new LoginResponseDto
+        app.MapPost("/auth/login",
+            ([FromBody] LoginRequestDto loginData, [FromServices] AppDbContext db,
+                [FromServices] JwtTokenService tokens) =>
             {
-                Email = user.Email,
-                AccessToken = encodedJwt
-            };
+                var user = db.Users.FirstOrDefault(u => u.Email == loginData.Email && u.Password == loginData.Password);
 
-            return Results.Ok(loginResponse);
-        });
+                if (user is null) return Results.Unauthorized();
+
+                var encodedJwt = tokens.CreateToken(user.Email);
+
+                var loginResponse = new LoginResponseDto
+                {
+                    Email = user.Email,
+                    AccessToken = encodedJwt
+                };
+
+                return Results.Ok(loginResponse);
+            });
 
         app.MapGet("/auth/google", (HttpContext ctx, IConfiguration cfg, [FromQuery] string? returnUrl) =>
             {
                 if (!IsGoogleConfigured(cfg))
-                    return Results.Problem("Google OAuth is not configured on the server.", statusCode: StatusCodes.Status501NotImplemented);
+                    return Results.Problem("Google OAuth is not configured on the server.",
+                        statusCode: StatusCodes.Status501NotImplemented);
 
                 var safeReturnUrl = SanitizeReturnUrl(returnUrl) ?? "/create_link.html";
 

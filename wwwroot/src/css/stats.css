@@ -72,7 +72,7 @@
 .stats__table-wrapper {
     overflow-x: auto;
     overflow-y: auto;
-    max-height: 420px; 
+    max-height: 420px;
 }
 
 
@@ -88,12 +88,14 @@
     padding: 6px 4px;
     white-space: nowrap;
 }
+
 .stats__table thead th {
     position: sticky;
     top: 0;
     background: #ffffff;
     z-index: 2;
 }
+
 .stats__table th {
     font-size: 11px;
     text-transform: uppercase;

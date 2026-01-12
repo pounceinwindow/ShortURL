@@ -1,10 +1,9 @@
 ﻿using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using MaxMind.GeoIP2;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
+using ShortUrl.Application.Options;
 using UAParser;
 using URLShortener.Data;
 using URLShortener.DTO;
@@ -18,7 +17,6 @@ public static class LinkEndpoints
 {
     public static void MapLinkEndpoints(this WebApplication app)
     {
-        
         var links = app.MapGroup("/links").RequireAuthorization();
 
         links.MapPost("/", static async (
@@ -39,7 +37,7 @@ public static class LinkEndpoints
             if (string.IsNullOrEmpty(code))
                 for (var i = 0; i < 8; i++)
                 {
-                    code = GenerateCode(7);
+                    code = GenerateCodeOption.GenerateCode(7);
                     if (!await db.ShortLinks.AnyAsync(x => x.ShortCode == code)) break;
                     if (i == 7) return Results.StatusCode(500);
                 }
@@ -59,7 +57,7 @@ public static class LinkEndpoints
             var shortUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{code}";
             return Results.Ok(new CreateLinkResponse { Id = link.Id, ShortCode = link.ShortCode, ShortUrl = shortUrl });
         });
-        
+
         links.MapGet("/", static async (
             [FromQuery] int page,
             [FromQuery] int pageSize,
@@ -164,7 +162,7 @@ public static class LinkEndpoints
                 await db.SaveChangesAsync();
                 return Results.Redirect(link.OriginalUrl);
             }).AllowAnonymous();
-        
+
         links.MapGet("/{code}/stats", static async (
             [FromRoute] string code,
             AppDbContext db,
@@ -183,7 +181,8 @@ public static class LinkEndpoints
             var since24h = now.AddHours(-24);
 
             var totalClicks = await db.Clicks.AsNoTracking().CountAsync(c => c.ShortLinkId == linkId);
-            var last24h = await db.Clicks.AsNoTracking().CountAsync(c => c.ShortLinkId == linkId && c.Timestamp >= since24h);
+            var last24h = await db.Clicks.AsNoTracking()
+                .CountAsync(c => c.ShortLinkId == linkId && c.Timestamp >= since24h);
 
             var lastClick = await db.Clicks.AsNoTracking()
                 .Where(c => c.ShortLinkId == linkId)
@@ -215,15 +214,6 @@ public static class LinkEndpoints
                 recent
             ));
         });
+    }
 
-    }
-    private static string GenerateCode(int len)
-    {
-        const string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Span<byte> bytes = stackalloc byte[len];
-        RandomNumberGenerator.Fill(bytes);
-        var sb = new StringBuilder(len);
-        for (var i = 0; i < len; i++) sb.Append(alphabet[bytes[i] % alphabet.Length]);
-        return sb.ToString();
-    }
 }

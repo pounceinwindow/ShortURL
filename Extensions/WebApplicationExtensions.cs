@@ -1,6 +1,6 @@
 using URLShortener.Endpoints;
 
-namespace URLShortener.Extensions;
+namespace ShortUrl.Web.Extensions;
 
 public static class WebApplicationExtensions
 {
